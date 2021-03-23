@@ -1,6 +1,6 @@
 # Device Manager
 
-A web application developed with educational purpose.
+A web application developed with educational purpose using Java, Spring Boot, Microservices, etc.
 <br/>
 
 Obs:
