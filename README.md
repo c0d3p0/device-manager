@@ -6,5 +6,5 @@ A web application developed with educational purpose using Java, Spring Boot, Mi
 Obs:
 <br/>
 There are binaries inside the folder "device-manager-binaries". <br />
-You can find the admin credentials inside the "credentials.txt" file.
+Check tutorial.txt for information about credentials and the frontend.
 <br/><br/>
