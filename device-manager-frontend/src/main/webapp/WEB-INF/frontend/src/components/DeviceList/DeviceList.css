@@ -1,0 +1,86 @@
+.device-list .message-item
+{
+  color: #252B45;
+  font-weight: bold;
+  text-align: center;
+}
+
+.device-list .device-item
+{
+  color: #252B45;
+}
+
+.device-list .device-item .main-data
+{
+  display: flex;
+  flex-direction: column;
+}
+
+.device-list .device-item .main-data label
+{
+  font-weight: bold;
+}
+
+.device-list .device-item a
+{
+  margin-left: 1rem;
+}
+
+.device-list .device-item a:visited
+{
+  color: #3061be;
+}
+
+.device-list .item-list 
+{
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.device-list .item-list .item-list-content .item-list-row
+{
+  display: flex;
+  flex-direction: row;
+}
+
+.device-list .item-list .item-list-content .item-list-row:first-child
+{
+  font-weight: bold;
+}
+
+.device-list .item-list .item-list-content .item-list-row *
+{
+  text-align: center;
+  overflow-x: hidden;
+}
+
+.device-list .item-list .item-list-content .item-list-row *:first-child
+{
+  width: 10%;
+}
+
+.device-list .item-list .item-list-content .item-list-row *:nth-child(2)
+{
+  width: 50%;
+}
+
+.device-list .item-list .item-list-content .item-list-row *:nth-child(3)
+{
+  width: 25%;
+}
+
+.device-list .item-list .item-list-content .item-list-row *:last-child
+{
+  width: 20%;
+}
+
+.device-list .edit-actions
+{
+  height: 0;
+  margin-left: auto;
+}
+
+.device-list .edit-actions button:not(:first-child)
+{
+  margin-left: 0.5rem;
+}

@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -71,6 +72,22 @@ public class DispatcherService
 		return restTemplate.exchange(url, method, he, responseType, param);
 	}
 	
+	public <T> ResponseEntity<T> dispatch(String url,
+			HttpMethod method, HttpHeaders headers, Resource body,
+			ParameterizedTypeReference<T> responseType, Object param)
+	{
+		HttpEntity<Resource> he = new HttpEntity<>(body, headers);
+		return restTemplate.exchange(url, method, he, responseType, param);
+	}
+
+	public <T, TB> ResponseEntity<T> dispatch(String url,
+			HttpMethod method, HttpHeaders headers, TB body,
+			ParameterizedTypeReference<T> responseType, Object param)
+	{
+		HttpEntity<TB> he = new HttpEntity<>(body, headers);
+		return restTemplate.exchange(url, method, he, responseType, param);
+	}
+
 	private void createServiceUrlMap()
 	{
 		serviceUrlMap = new HashMap<>();

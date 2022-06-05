@@ -1,0 +1,47 @@
+.header
+{
+  background-color: #252B45;
+  height: 5rem;
+
+  display: flex;
+  flex-direction: row;
+
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.header .app-mode
+{
+  color: white;
+  font-size: 1.5em;
+  font-weight: bold;
+  background-color: transparent;
+  cursor: pointer;
+
+  height: 3rem;
+  width: 3rem;
+
+  border: 2px;
+  border-style: solid;
+  border-color: white;
+  border-radius: 50%;
+  outline: none;
+
+  margin: auto;
+}
+
+.header img
+{
+  height: 2rem;
+
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.header .edit-mode-on
+{
+  background-color: #52688F;
+}

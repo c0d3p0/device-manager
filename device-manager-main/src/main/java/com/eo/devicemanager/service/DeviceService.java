@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.eo.devicemanager.model.Device;
 import com.eo.devicemanager.model.DeviceFirmware;
+import com.eo.devicemanager.model.FileResource;
 import com.eo.devicemanager.model.Firmware;
 import com.eo.devicemanager.util.HttpUtil;
 
@@ -66,12 +68,23 @@ public class DeviceService
 		return device;
 	}
 
-	public Firmware findCurrentFirmwareById(Long deviceId)
+	public FileResource getCurrentFirmwareAsFileResource(Long id, HttpServletRequest request)
 	{
-		DeviceFirmware deviceFirmware = restTemplate.getForObject(
-				deviceFirmwareLatestDeviceIdUrl, DeviceFirmware.class, deviceId);
-		return restTemplate.getForObject(firmwareIdUrl, Firmware.class,
-				deviceFirmware.getFirmwareId());
+		Device device = findById(id);
+		Firmware currentFirmware = device.getCurrentFirmware();
+
+		if(currentFirmware != null && currentFirmware.getId() != null)
+		{
+			Long firmwareId = currentFirmware.getId();
+			HttpHeaders headers = HttpUtil.getHeadersFromRequest(request);
+			Resource resource = dispatchService.dispatch(firmwareDownloadUrl,
+					HttpMethod.GET, headers, null, Resource.class, firmwareId).getBody();
+			String name = currentFirmware.getName() != null ?
+					currentFirmware.getName() : "no_name";
+			return new FileResource(name, resource);
+		}
+
+		return new FileResource("empty_firmware", null);
 	}
 
 	public Device delete(Long id, HttpServletRequest request)
@@ -95,6 +108,7 @@ public class DeviceService
 			"http://device-firmware-service/device-firmware/latest-by-device-id/{deviceId}";
 	private String deviceFirmwareDeviceIdUrl =
 			"http://device-firmware-service/device-firmware/by-device-id/{deviceId}";
+	private String firmwareDownloadUrl = "http://firmware-service/firmware/download/{id}";
 	private String firmwareIdUrl = "http://firmware-service/firmware/by-id/{id}";
 	private String deviceIdUrl = "http://device-service/device/{id}";
 }

@@ -45,10 +45,9 @@ public class DeviceFirmwareController
 	}
 
 	@PostMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public DeviceFirmware save(@RequestBody DeviceFirmware deviceFirmware)
+	public List<DeviceFirmware> save(@RequestBody DeviceFirmware deviceFirmware)
 	{
-		deviceFirmwareService.save(deviceFirmware);
-		return deviceFirmware;
+		return deviceFirmwareService.save(deviceFirmware);
 	}
 
 	@DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

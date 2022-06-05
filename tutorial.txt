@@ -1,0 +1,21 @@
+1: Credentials
+
+User: admin
+Pass: admin
+
+
+
+2: Backend POST, PATCH, DELETE request header
+
+headers:
+{
+  Accept: 'application/json',
+  'Content-Type': 'application/json',
+  Authorization: 'Basic YWRtaW46YWRtaW4='
+},
+
+
+
+3: Frontend URL
+
+http://localhost:3000

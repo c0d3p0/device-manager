@@ -1,5 +1,7 @@
 package com.eo.devicemanager.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ import com.eo.devicemanager.service.DeviceFirmwareService;
 public class DeviceFirmwareController
 {
 	@PostMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-	public DeviceFirmware delete(@RequestBody DeviceFirmware deviceFirmware,
+	public List<DeviceFirmware> save(@RequestBody DeviceFirmware deviceFirmware,
 			HttpServletRequest request)
 	{
 		return deviceFirmwareService.save(deviceFirmware, request);

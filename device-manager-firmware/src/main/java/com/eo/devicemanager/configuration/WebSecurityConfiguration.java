@@ -24,12 +24,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 				.exceptionHandling()
 				.authenticationEntryPoint(restAuthenticationEntryPoint).and()
 				.authenticationProvider(userPasswordAuthenticationProvider)
-				.authorizeRequests().
+				.authorizeRequests()
 
-				antMatchers(HttpMethod.GET, firmwareAll, firmwareById,firmwareByName)
-				.permitAll().
+				.antMatchers(HttpMethod.GET, firmwareAll, firmwareById,
+						firmwareByName, firmwareDownload).permitAll()
 				
-				antMatchers(HttpMethod.POST, firmware)
+				.antMatchers(HttpMethod.POST, firmware)
 				.hasAuthority(Role.ROLE_ADMIN)
 				
 				.antMatchers(HttpMethod.PATCH, firmwareId)
@@ -51,6 +51,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 	private String firmwareAll = "/firmware/all";
 	private String firmwareById = "/firmware/by-id/{id}";
 	private String firmwareByName = "/firmware/by-name/{name}";
+	private String firmwareDownload = "/firmware/download/{id}";
 	private String firmware = "/firmware";
 	private String firmwareId = "/firmware/{id}";
 }

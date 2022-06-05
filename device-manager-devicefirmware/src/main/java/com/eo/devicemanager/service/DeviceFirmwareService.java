@@ -65,7 +65,7 @@ public class DeviceFirmwareService
 		}
 	}
 	
-	public void save(DeviceFirmware deviceFirmware)
+	public List<DeviceFirmware> save(DeviceFirmware deviceFirmware)
 	{
 		try
 		{
@@ -75,7 +75,7 @@ public class DeviceFirmwareService
 						"Field device_ids can't be empty. Pass an array with 1 or more ids!");
 			}
 
-			deviceFirmwareRepository.save(deviceFirmware);
+			return deviceFirmwareRepository.save(deviceFirmware);
 		}
 		catch (Exception e)
 		{

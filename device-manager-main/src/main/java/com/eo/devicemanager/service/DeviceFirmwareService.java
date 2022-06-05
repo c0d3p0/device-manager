@@ -1,9 +1,12 @@
 package com.eo.devicemanager.service;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,7 +20,7 @@ import com.eo.devicemanager.util.HttpUtil;
 @Service
 public class DeviceFirmwareService
 {
-	public DeviceFirmware save(DeviceFirmware deviceFirmware,
+	public List<DeviceFirmware> save(DeviceFirmware deviceFirmware,
 			HttpServletRequest request)
 	{
 		if(deviceFirmware.getDeviceIds() == null ||
@@ -38,7 +41,8 @@ public class DeviceFirmwareService
 
 		for(Long deviceId : deviceFirmware.getDeviceIds())
 		{
-			Device device = restTemplate.getForObject(deviceByIdUrl, Device.class, deviceId);
+			Device device = restTemplate.getForObject(
+					deviceByIdUrl, Device.class, deviceId);
 
 			if (device.getId() != deviceId)
 			{
@@ -47,15 +51,20 @@ public class DeviceFirmwareService
 			}
 		}
 
-		HttpEntity<DeviceFirmware> he = new HttpEntity<>(deviceFirmware,
-				HttpUtil.getHeadersFromRequest(request));
-		return restTemplate.exchange(deviceFirmwareUrl, HttpMethod.POST, he,
-				DeviceFirmware.class).getBody();
+		HttpHeaders headers = HttpUtil.getHeadersFromRequest(request);
+		ParameterizedTypeReference<List<DeviceFirmware>> responseType =
+				new ParameterizedTypeReference<List<DeviceFirmware>>(){};
+		return dispatchService.dispatch(deviceFirmwareUrl, HttpMethod.POST,
+				headers, deviceFirmware, responseType, null).getBody();
 	}
 
-	
+
 	@Autowired
 	private RestTemplate restTemplate;
+
+	@Autowired
+	private DispatcherService dispatchService;
+
 
 	private String deviceByIdUrl = "http://device-service/device/by-id/{id}";
 	private String firmwareIdUrl = "http://firmware-service/firmware/by-id/{id}";

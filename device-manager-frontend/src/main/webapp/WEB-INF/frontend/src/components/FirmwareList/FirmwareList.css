@@ -1,0 +1,33 @@
+.firmware-list .message-item
+{
+  color: #252B45;
+  font-weight: bold;
+  text-align: center;
+}
+
+.firmware-list .firmware-item
+{
+  color: #252B45;
+}
+
+.firmware-list .firmware-item .main-data
+{
+  display: flex;
+  flex-direction: column;
+}
+
+.firmware-list .firmware-item .main-data label
+{
+  font-weight: bold;
+}
+
+.firmware-list .edit-actions
+{
+  height: 0;
+  margin-left: auto;
+}
+
+.firmware-list .edit-actions button:not(:first-child)
+{
+  margin-left: 0.5rem;
+}

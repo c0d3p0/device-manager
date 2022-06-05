@@ -4,7 +4,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -14,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eo.devicemanager.model.DeviceFirmware;
 
@@ -153,9 +156,15 @@ public class DeviceFirmwareRepository
 		});
 	}
 	
-	public void save(DeviceFirmware deviceFirmware) throws DataAccessException, SQLException
+	@Transactional
+	public List<DeviceFirmware> save(DeviceFirmware deviceFirmware)
+			throws DataAccessException, SQLException	
 	{
 		final String sql = "INSERT INTO DeviceFirmware(device_id, firmware_id) VALUES (?, ?)";
+		var deviceFirmwareList = findByFirmwareId(deviceFirmware.getFirmwareId());
+		var oldSet = deviceFirmwareList.stream().
+				map(DeviceFirmware::getId).collect(Collectors.toSet());
+		
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter()
 		{
 			@Override
@@ -172,6 +181,15 @@ public class DeviceFirmwareRepository
 				return deviceFirmware.getDeviceIds().length;
 			}
 		});
+
+		var newList = findByFirmwareId(deviceFirmware.getFirmwareId());
+		var addedList = new LinkedList<DeviceFirmware>();
+		newList.forEach((item) -> {
+			if(!oldSet.contains(item.getId()))
+				addedList.add(item);
+		});
+		
+		return addedList;
 	}
 
 	public DeviceFirmware delete(Long id) throws DataAccessException, SQLException

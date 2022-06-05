@@ -1,0 +1,87 @@
+.device-firmware-form .back-action
+{
+  width: 50%;
+  height: 0;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.device-firmware-form .back-action button
+{
+  padding-top: 0;
+
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 0.8rem;
+}
+
+.device-firmware-form form
+{
+  color: #252B45;
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 1rem;
+}
+
+.device-firmware-form .field
+{
+  display: flex;
+  flex-direction: row;
+
+  margin-bottom: 0.5rem;
+}
+
+.device-firmware-form label
+{
+  width: 6rem;
+  min-width: 6rem;
+}
+
+.device-firmware-form select
+{
+  text-align: center;
+}
+
+.device-firmware-form .item-list
+{
+  margin-top: 1.5rem;
+}
+
+.device-firmware-form .item-list .item-list-items
+{
+  min-height: 1.5rem;
+  max-height: 10rem;
+
+  padding: 0.5rem;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.device-firmware-form .item-list .item-list-items button:not(:last-child)
+{
+  margin-right: 1.5rem;
+}
+
+.device-firmware-form .form-actions
+{
+  display: flex;
+  flex-direction: row;
+
+  margin-top: 2rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.device-firmware-form .message
+{
+  color: #252B45;
+  margin-top: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}

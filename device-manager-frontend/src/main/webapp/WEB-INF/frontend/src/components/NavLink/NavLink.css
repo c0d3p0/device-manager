@@ -1,0 +1,25 @@
+.nav-link
+{
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-link button
+{
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  background-color: transparent;
+
+  padding-left: 18px;
+  padding-right: 18px;
+  
+  border: 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.nav-link button:hover
+{
+  background-color: #52688F;
+}
