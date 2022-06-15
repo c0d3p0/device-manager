@@ -86,7 +86,7 @@ export default function DeviceFirmwareFormView(props: IProps)
           </button>
         </div>
         <div className="box">
-          <h2>Device Form</h2>
+          <h2>Attach Firmware to Devices</h2>
           <span className="message">{m}</span>
         </div>
       </div>

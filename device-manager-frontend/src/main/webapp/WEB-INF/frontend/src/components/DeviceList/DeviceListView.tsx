@@ -82,39 +82,55 @@ const createDeviceElement = (props: IProps, device: Device) =>
 
 const createDeviceEditElements = (props: IProps, device: Device) =>
 {
-  const id = device?.id;
-  return props?.editMode ? (
-    <div className="edit-actions">
-      <button
-        className="round-button"
-        title="Show History"
-        onClick={(e) => {props?.onShowHistoryClick(id);}}
-      >
-        🕙
-      </button>
-      <button
-        className="round-button"
-        title="Attach Firmware"
-        onClick={(e) => {props?.onAttachFirmwareClick(id);}}
-      >
-        🖇
-      </button>
-      <button
-        className="round-button"
-        title="Edit Device"
-        onClick={(e) => {props?.onEditClick(id);}}
-      >
-        🗒
-      </button>
-      <button
-        className="round-button"
-        title="Remove Device"
-        onClick={(e) => {props?.onRemoveClick(device);}}
-      >
-        🗑
-      </button>
-    </div>
-  ) : null;
+  if(props?.editMode)
+  {
+    return (
+      <div className="edit-actions">
+        <button
+          className="round-button"
+          title="Show History"
+          onClick={(e) => {props?.onShowHistoryClick(device?.id);}}
+        >
+          🕙
+        </button>
+        <button
+          className="round-button"
+          title="Attach Firmware"
+          onClick={(e) => {props?.onAttachFirmwareClick(device?.id);}}
+        >
+          🖇
+        </button>
+        <button
+          className="round-button"
+          title="Edit Device"
+          onClick={(e) => {props?.onEditClick(device?.id);}}
+        >
+          🗒
+        </button>
+        <button
+          className="round-button"
+          title="Remove Device"
+          onClick={(e) => {props?.onRemoveClick(device);}}
+        >
+          🗑
+        </button>
+      </div>
+    )
+  }
+  else
+  {
+    return (
+      <div className="edit-actions">
+        <button
+          className="round-button"
+          title="Show History"
+          onClick={(e) => {props?.onShowHistoryClick(device?.id);}}
+        >
+          🕙
+        </button>
+      </div>
+    );
+  }
 }
 
 const createCurrentFirmwareElement = (props: IProps, device: Device) =>

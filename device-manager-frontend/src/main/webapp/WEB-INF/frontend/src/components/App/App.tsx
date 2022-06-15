@@ -22,6 +22,7 @@ function App()
         <div className="page-content">
           <Routes>
             <Route path="/" element={<About />} />
+            <Route path="/index" element={<About />} />
             <Route path="/device/*" element={<DeviceList />} />
             <Route path="/firmware/*" element={<FirmwareList />} />
             <Route path="/about/*" element={<About />} />
@@ -29,7 +30,7 @@ function App()
             <Route path="/firmware-form/*" element={<FirmwareForm />} />
             <Route path="/device-firmware-form/*" element={<DeviceFirmwareForm />} />
             <Route path="/index/*" element={<About />} />
-            <Route path="*" element={<InvalidUrl />} />
+            <Route path="/*" element={<InvalidUrl />} />
           </Routes>
         </div>
         <Footer />
