@@ -6,7 +6,7 @@ import HeaderView from "./HeaderView";
 export default function Header()
 {
   const dispatch = useDispatch();
-  const editMode = useSelector((state: any) => state.editMode.value as boolean);
+  const editMode = useSelector<any, boolean>((state) => state.editMode.value);
 
   const toggleMode = () =>
   {

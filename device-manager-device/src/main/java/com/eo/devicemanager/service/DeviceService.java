@@ -29,11 +29,11 @@ public class DeviceService
 		}
 	}
 
-	public List<Device> findByName(String name)
+	public List<Device> findByNameWith(String name)
 	{
 		try
 		{
-			return deviceRepository.findByName(name);
+			return deviceRepository.findByNameWith(name);
 		}
 		catch (Exception e)
 		{

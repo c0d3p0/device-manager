@@ -1,12 +1,10 @@
+import { IState } from "./DeviceForm";
 import "./DeviceForm.css"
 
 
 export default function DeviceFormView(props: IProps)
 {
-  const {editMode, formType, title, apiAction, state} = props;
-
-  
-  if(editMode && formType && !state?.error)
+  if(props.editMode && !props.state.message)
   {
     return (
       <div className="device-form">
@@ -15,22 +13,22 @@ export default function DeviceFormView(props: IProps)
             className="round-button"
             type="button"
             title="Go Back"
-            onClick={(e) => {props?.onReturnClick();}}
+            onClick={(e) => {props.onReturnClick();}}
           >
             👈
           </button>
         </div>
         <div className="box">
-          <h2>{title}</h2>
-          <form onSubmit={(e) => {e.preventDefault(); props?.onSubmit()}}>
+          <h2>{`${props.state.isEditing ? "Update" : "New"} Device`}</h2>
+          <form onSubmit={(e) => {e.preventDefault(); props.onSubmit()}}>
             <div className="field">
               <label>Name: </label>
               <input
                 className="textfield"
                 type="text"
                 placeholder="Device Name"
-                value={state.name ? state.name : ""}
-                onChange={(e) => {props?.updateState("name", e.target.value)}}
+                value={props.state.name ?? ""}
+                onChange={(e) => {props.updateState("name", e.target.value)}}
                 />
             </div>
             <div className="field">
@@ -39,8 +37,8 @@ export default function DeviceFormView(props: IProps)
                 className="textfield"
                 type="text"
                 placeholder="Hardware Version"
-                value={state.hardwareVersion ? state.hardwareVersion : ""}
-                onChange={(e) => {props?.updateState("hardwareVersion", e.target.value)}}
+                value={props.state.hardwareVersion ?? ""}
+                onChange={(e) => {props.updateState("hardwareVersion", e.target.value)}}
               />
             </div>
             <div className="form-actions">
@@ -53,16 +51,6 @@ export default function DeviceFormView(props: IProps)
   }
   else
   {
-    let m =
-    [
-      "Couldn't get the device data to edit!",
-      "Invalid operation, it must be a save or an update!",
-      "You don't have permission to change any data!"
-    ];
-    let message = state?.error ? m[0] : (editMode ? m[1] : m[2]);
-    console.log(apiAction);
-    console.log(message);
-
     return (
       <div className="device-form">
         <div className="back-action">
@@ -70,14 +58,14 @@ export default function DeviceFormView(props: IProps)
             className="round-button"
             type="button"
             title="Go Back"
-            onClick={(e) => {props?.onReturnClick();}}
+            onClick={(e) => {props.onReturnClick();}}
           >
             👈
           </button>
         </div>
         <div className="box">
           <h2>Device Form</h2>
-          <span className="message">{message}</span>
+          <span className="message">{props.state.message}</span>
         </div>
       </div>
     );
@@ -88,10 +76,7 @@ export default function DeviceFormView(props: IProps)
 interface IProps
 {
   editMode: boolean;
-  apiAction: any;
-  formType: string | undefined;
-  title: string;
-  state: any;
+  state: IState;
   onSubmit(): void;
   onReturnClick(): void;
   updateState(type: string, value: any): void;

@@ -32,11 +32,11 @@ public class FirmwareService
 		}
 	}
 
-	public List<Firmware> findByName(String name)
+	public List<Firmware> findByNameWith(String name)
 	{
 		try
 		{
-			return firmwareRepository.findByName(name);
+			return firmwareRepository.findByNameWith(name);
 		}
 		catch (Exception e)
 		{

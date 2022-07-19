@@ -1,11 +1,10 @@
+import { ISearchData } from "../../data/SearchActionMap";
+
 import "./Search.css"
 
 
 export default function SearchView(props: IProps)
 {
-  const optionElements = createOptionElements(props?.searchMap);
-
-
   return (
     <div className="search">
       <form onSubmit={(e) => {e.preventDefault(); props?.onSearchClick();}}>
@@ -15,8 +14,8 @@ export default function SearchView(props: IProps)
           placeholder="Search"
           onChange={(e) => {props?.setSearch(e.target.value)}}
         />
-        <select onChange={(e) => {props?.setApiActionKey(e.target.value)}}>
-          {optionElements}
+        <select onChange={(e) => {props?.setSearchType(e.target.value)}}>
+          {createOptionElements(props)}
         </select>
         <button type="submit">Search</button>
       </form>
@@ -24,30 +23,20 @@ export default function SearchView(props: IProps)
   );
 }
 
-const createOptionElements = (searchMap: Map<string, any>) =>
+const createOptionElements = (props: IProps) =>
 {
-  const elements: JSX.Element[] = [];
-  searchMap?.forEach((v: any, k: string) =>
-  {
-    elements.push(createOptionElement(v.id, k, v.label))
-  });
-  return elements
-}
-
-const createOptionElement = (key: number, value: string, text: string) =>
-{
-  return (
-    <option key={key} value={value}>{text}</option>
+  return props.searchDataList.map((sd) =>
+    <option key={sd.key} value={sd.key}>{sd.label}</option>
   );
 }
 
 
 interface IProps
 {
-  searchMap: Map<string, any>;
+  searchDataList: ISearchData[];
   search: string;
-  apiActionKey: string;
+  searchType: string;
   setSearch(search: string): void;
-  setApiActionKey(setApiActionKey: string): void;
+  setSearchType(setApiActionKey: string): void;
   onSearchClick(): void;
 }

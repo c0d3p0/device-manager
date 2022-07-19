@@ -67,17 +67,17 @@ public class FirmwareRepository
 		});
 	}
 
-	public List<Firmware> findByName(String name)
+	public List<Firmware> findByNameWith(String name)
 			throws SQLException, DataAccessException
 	{
-		String sql = "SELECT * FROM Firmware WHERE name = ?";
+		String sql = "SELECT * FROM Firmware WHERE lower(name) like lower(?)";
 		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<Firmware>>()
 		{
 			@Override
 			public List<Firmware> doInPreparedStatement(PreparedStatement ps)
 					throws SQLException, DataAccessException
 			{
-				ps.setString(1, name);
+				ps.setString(1, "%" + name + "%");
 				ResultSet rs = ps.executeQuery();
 				List<Firmware> firmwareList = new ArrayList<>();
 				Firmware firmware = null;

@@ -9,15 +9,27 @@ export default function FirmwareListView(props: IProps)
   const addFirmwareButton = createAddFirmwareElement(props);
   const listElements = createFirmwareListElements(props);
 
+  if(props.firmwares && !props.message)
+  {
+    return (
+      <div className="firmware-list">
+        <div className="box">
+          <h2>Firmwares</h2>
+          <Search />
+          <div className='edit-actions'>{addFirmwareButton}</div>
+        </div>
+        {listElements}
+      </div>
+    );
+  }
 
   return (
     <div className="firmware-list">
       <div className="box">
-        <h2>Firmware List</h2>
+        <h2>Firmwares</h2>
         <Search />
         <div className='edit-actions'>{addFirmwareButton}</div>
       </div>
-      {listElements}
       {createMessageElement(props?.message)}
     </div>
   );
@@ -39,12 +51,9 @@ const createAddFirmwareElement = (props: IProps) =>
 
 const createFirmwareListElements = (props: IProps) =>
 {
-  const elements: JSX.Element[] = [];
-  props?.firmwareData?.forEach((firmware: Firmware) =>
-  {
-    elements.push(createFirmwareElement(props, firmware));
-  });
-  return elements;
+  return props?.firmwares?.map((firmware) =>
+    createFirmwareElement(props, firmware)
+  );
 }
 
 const createFirmwareElement = (props: IProps, firmware: Firmware) =>
@@ -126,7 +135,7 @@ interface IProps
 {
   apiActionMap: Map<string, any>;
   editMode: boolean;
-  firmwareData: Firmware[];
+  firmwares: Firmware[] | null;
   message: string;
   onAddClick(): void;
   onAttachToDevicesClick(id?: number): void;

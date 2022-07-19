@@ -1,19 +1,16 @@
-import Device from "../../model/Device";
-import Firmware from "../../model/Firmware";
+import { IState } from "./DeviceFirmwareForm";
 
 import "./DeviceFirmwareForm.css"
 
 
 export default function DeviceFirmwareFormView(props: IProps)
 {
-  const {editMode, apiAction, state} = props;
-  const deviceOptionElements = createDeviceOptionElements(props);
-  const firmwareOptionElements = createFirmwareOptionElements(props);
-  const deviceToDetachElements = createDeviceToDetachElements(props);
-
-
-  if(editMode && !state?.error)
+  if(props.editMode && !props.state.message)
   {
+    const deviceOptionElements = createDeviceOptionElements(props);
+    const firmwareOptionElements = createFirmwareOptionElements(props);
+    const deviceToDetachElements = createDeviceToDetachElements(props);
+
     return (
       <div className="device-firmware-form">
         <div className="back-action">
@@ -35,7 +32,7 @@ export default function DeviceFirmwareFormView(props: IProps)
               <label>Firmware: </label>
               <select
                 className="button"
-                value={state?.firmwareId ? state?.firmwareId : "-1"}
+                value={props.state.firmwareId ?? "-1"}
                 onChange={(e) => props?.updateState("firmwareId", e.target.value)}
               >
                 <option value="-1">Select a firmware</option>
@@ -69,10 +66,6 @@ export default function DeviceFirmwareFormView(props: IProps)
   }
   else
   {
-    let m = editMode ? state?.error : "You don't have permission to change any data!";
-    console.log(apiAction);
-    console.log(m);
-
     return (
       <div className="device-form">
         <div className="back-action">
@@ -87,7 +80,7 @@ export default function DeviceFirmwareFormView(props: IProps)
         </div>
         <div className="box">
           <h2>Attach Firmware to Devices</h2>
-          <span className="message">{m}</span>
+          <span className="message">{props.state.message}</span>
         </div>
       </div>
     );
@@ -98,7 +91,7 @@ export default function DeviceFirmwareFormView(props: IProps)
 const createDeviceOptionElements = (props: IProps) =>
 {
   const elements: JSX.Element[] = [];
-  props?.state?.deviceMap?.forEach((v: Device, k: number) => {
+  props?.state?.deviceMap?.forEach((v, k) => {
     elements.push(<option key={v.id} value={v.id}>{v.name}</option>);
   });
   return elements;
@@ -106,30 +99,28 @@ const createDeviceOptionElements = (props: IProps) =>
 
 const createFirmwareOptionElements = (props: IProps) =>
 {
-  const elements: JSX.Element[] = [];
-  props?.state?.firmwares?.forEach((f: Firmware) => {
-    elements.push(<option key={f.id} value={f.id}>{f.name}</option>);
-  });
-  return elements;
+  return props?.state?.firmwares?.map((f) =>
+    <option key={f.id} value={f.id}>{f.name}</option>
+  );
 }
 
 const createDeviceToDetachElements = (props: IProps) =>
 {
-  const {state, detachDevice} = props;
   const elements: JSX.Element[] = [];
-  state?.deviceIds?.forEach((id: number) => {
-    const device = state?.deviceMap?.get(id);
+  props.state.deviceIds?.forEach((id, index) => {
+    const device = props.state.deviceMap.get(id);
+    const vId = device?.id ?? -1;
 
-    if(device)
+    if(device && vId > -1)
     {
       elements.push(
         <button
           className="button"
-          key={device?.id}
+          key={index}
           title="Detach Device"
-          onClick={(e) => {e.preventDefault(); detachDevice(device?.id);}}
+          onClick={(e) => {e.preventDefault(); props.detachDevice(vId);}}
         >
-          {device?.name}
+          {device.name}
         </button>
       );
     }
@@ -141,8 +132,7 @@ const createDeviceToDetachElements = (props: IProps) =>
 interface IProps
 {
   editMode: boolean;
-  apiAction: any;
-  state: any;
+  state: IState;
   attachDevice(idText: string): void;
   detachDevice(id: number): void;
   onSubmit(): void;

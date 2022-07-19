@@ -1,12 +1,11 @@
+import { IState } from "./FirmwareForm";
+
 import "./FirmwareForm.css"
 
 
 export default function FirmwareFormView(props: IProps)
 {
-  const {editMode, formType, title, apiAction, state} = props;
-
-
-  if(editMode && formType && !state?.error)
+  if(props.editMode && !props.state.message)
   {
     return (
       <div className="firmware-form">
@@ -21,7 +20,7 @@ export default function FirmwareFormView(props: IProps)
           </button>
         </div>
         <div className="box">
-          <h2>{title}</h2>
+        <h2>{`${props.state.isEditing ? "Update" : "New"} Firmware`}</h2>
           <form onSubmit={(e) => {e.preventDefault(); props?.onSubmit()}}>
             <div className="field">
               <label>Name: </label>
@@ -30,7 +29,7 @@ export default function FirmwareFormView(props: IProps)
                 className="textfield"
                 type="text"
                 placeholder="Firmware Name"
-                value={state?.name ? state.name : ""}
+                value={props.state.name ?? ""}
                 onChange={(e) => {props?.updateState("name", e.target.value);}}
               />
             </div>
@@ -43,7 +42,7 @@ export default function FirmwareFormView(props: IProps)
                 type="file"
                 onChange={(e) => {props?.onReadBinaryClick(e.target?.files?.item(0))}}
               />
-              {state?.readingBinary ? (<span>Reading binary...</span>) : null}
+              {props.state.readingBinary ? (<span>Reading binary...</span>) : null}
             </div>
             <div className="form-actions">
               <button className="button" type="submit">Confirm</button>
@@ -55,16 +54,6 @@ export default function FirmwareFormView(props: IProps)
   }
   else
   {
-    let m =
-    [
-      "Couldn't get the firmware data to edit!",
-      "Invalid operation, it must be a save or an update!",
-      "You don't have permission to change any data!"
-    ];
-    let message = state?.error ? m[0] : (editMode ? m[1] : m[2]);
-    console.log(apiAction);
-    console.log(message);
-
     return (
       <div className="firmware-form">
         <div className="back-action">
@@ -79,7 +68,7 @@ export default function FirmwareFormView(props: IProps)
         </div>
         <div className="box">
           <h2>Firmware Form</h2>
-          <span className="message">{message}</span>
+          <span className="message">{props.state.message}</span>
         </div>
       </div>
     );
@@ -90,10 +79,7 @@ export default function FirmwareFormView(props: IProps)
 interface IProps
 {
   editMode: boolean;
-  apiAction: any;
-  formType: string | undefined;
-  title: string;
-  state: any;
+  state: IState;
   onReadBinaryClick(file?: File | null): void;
   onSubmit(): void;
   onReturnClick(): void;

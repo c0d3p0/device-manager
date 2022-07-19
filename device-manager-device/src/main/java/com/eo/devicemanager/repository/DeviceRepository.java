@@ -67,21 +67,21 @@ public class DeviceRepository
 		});
 	}
 
-	public List<Device> findByName(String name) throws SQLException, DataAccessException
+	public List<Device> findByNameWith(String name) throws SQLException, DataAccessException
 	{
-		String sql = "SELECT * FROM Device WHERE name = ?";
+		String sql = "SELECT * FROM Device WHERE lower(name) like lower(?)";
 		return jdbcTemplate.execute(sql, new PreparedStatementCallback<List<Device>>()
 		{
 			@Override
 			public List<Device> doInPreparedStatement(PreparedStatement ps)
 					throws SQLException, DataAccessException
 			{
-				ps.setString(1, name);
+				ps.setString(1, "%" + name + "%");
 				ResultSet rs = ps.executeQuery();
 				List<Device> deviceList = new ArrayList<>();
 				Device device = null;
 	
-				while (rs.next())
+				while(rs.next())
 				{
 					device = new Device();
 					device.setId(rs.getLong("id"));

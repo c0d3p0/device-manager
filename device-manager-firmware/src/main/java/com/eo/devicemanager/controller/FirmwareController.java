@@ -38,9 +38,9 @@ public class FirmwareController
 	}
 
 	@GetMapping(path = "/by-name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Firmware> getByName(@PathVariable String name)
+	public List<Firmware> getByNameWith(@PathVariable String name)
 	{
-		return firmwareService.findByName(name);
+		return firmwareService.findByNameWith(name);
 	}
 
 	@GetMapping(path = "/download/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

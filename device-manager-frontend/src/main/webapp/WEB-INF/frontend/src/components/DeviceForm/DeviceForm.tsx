@@ -1,10 +1,8 @@
 import { useEffect, useReducer } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { setAction } from "../../features/ApiAction";
 import apiActionMap from "../../data/ApiActionMap";
-import formTypeMap from "../../data/FormTypeMap";
 import appService from "../../service/AppService";
 import Device from "../../model/Device";
 import DeviceFormView from "./DeviceFormView";
@@ -12,33 +10,43 @@ import DeviceFormView from "./DeviceFormView";
 
 export default function DeviceForm()
 {
+  const [state, dispatch] = useReducer(reducer, createEmptyState());
+  const editMode = useSelector<any, boolean>((state) => state.editMode.value);
+  const location = useLocation();
   const navigate = useNavigate();
-  const globalDispatch = useDispatch();
-  const [state, dispatch] = useReducer(reducer, {name: "", hardwareVersion: ""});
-  const apiActionData = useSelector((state: any) => state.apiAction.value);
-  const editMode = useSelector((state: any) => state.editMode.value as boolean);
-  const formType = formTypeMap.get(apiActionData.actionKey);
-  const apiAction = apiActionMap.get(apiActionData.actionKey);
-  const returnPath = apiAction ? "/" + apiAction.section : "/";
-  const formUpdate = formType === "update";
-  const title = formUpdate ? "Update Device" : "New Device";
-  useEffect(() => {fetchData()}, []);
-  
+  useEffect(() => {handleFormAccess()}, [editMode]);
+  useEffect(() => {fetchData()}, [editMode, location]);
+
+
+  const handleFormAccess = () => {
+    if(!editMode) {
+      const message = "You don't have permission to change any data!";
+      dispatch({type: "message", value: message});
+    } else {
+      dispatch({type: "state", value: createEmptyState()});
+    }
+  }
 
   const fetchData = () =>
   {
-    if(formUpdate)
+    if(state.isEditing)
     {
-      let action = apiActionMap.get("device-find-by-id");
-      const url = action?.url;
-      const method = action?.method;
-      const params = apiActionData?.params;
-      appService.executeRequest<Device>(url, method, params).then((response) => {
-        dispatch({type: "state", value: response.data});
-      }).
-      catch((error) => {
-        let message = "Couldn't get the device to edit!";
-        dispatch({type: "error", value: message});
+      const urlParams = appService.getCurrentURLParameters();
+      const apiAction = apiActionMap.get("device-find-by-id");
+      const url = apiAction?.url;
+      const method = apiAction?.method;
+      const params = [urlParams[2] ? urlParams[2] : "-1"];
+      const requestData = {url, method, params};
+      appService.executeRequest<Device>(requestData).then((response) =>
+      {
+        const {id, name, hardwareVersion} = response.data;
+        const isEditing = state.isEditing;
+        const newState = {isEditing, message: "", id, name, hardwareVersion};
+        dispatch({type: "state", value: newState});
+      }).catch((error) =>
+      {
+        let message = "Couldn't get the device to update!";
+        dispatch({type: "message", value: message});
         console.log(message);
         console.log(error);
       });
@@ -48,25 +56,26 @@ export default function DeviceForm()
   const onSubmit = () =>
   {
     const {id, name, hardwareVersion} = state;
-    const url = apiAction?.url;
-    const method = apiAction?.method;
-    const params = apiActionData?.params;
     const device = new Device(id, name, hardwareVersion);
     let validation = validateDevice(device);
   
     if(validation.valid)
     {
+      const key = state.isEditing ? "device-update" : "device-save";
+      const apiAction = apiActionMap.get(key);
+      const url = apiAction?.url;
+      const method = apiAction?.method;
+      const params = state.isEditing ? [state.id?.toString() ?? "-1"] : undefined;
       const body = {name: device.name, hardware_version: device.hardwareVersion};
-      appService.executeRequest<Device>(url, method, params, body).then((response) => {
-        let state =
-        {
-          name: formUpdate ? name : "",
-          hardwareVersion: formUpdate ? hardwareVersion : "",
-        };
-        dispatch({type: "state", value: state});
-        alert(`Device ${formUpdate ? "updated" : "added"} in the system!`);
-      }).
-      catch((error) => {
+      const requestData = {url, method, params, body};
+      appService.executeRequest<Device>(requestData).then((response) =>
+      {
+        alert(`Device ${state.isEditing ? "updated" : "added"} in the system!`);
+        
+        if(!state.isEditing)
+          dispatch({type: "state", value: createEmptyState()});
+      }).catch((error) =>
+      {
         let message = "Error sending the data to the system!";
         console.log(message);
         console.log(error);
@@ -82,12 +91,7 @@ export default function DeviceForm()
 
   const onReturnClick = () =>
   {
-    let actionKey = apiActionData?.previous?.actionKey;
-    let params = apiActionData?.previous?.params;
-    actionKey = actionKey ? actionKey : apiAction?.section;
-    params = params ? params : [];
-    globalDispatch(setAction({actionKey, params}));
-    navigate(returnPath);
+    navigate(-1);
   }
 
   const updateState = (type: string, value: any) =>
@@ -97,12 +101,15 @@ export default function DeviceForm()
 
   const validateDevice = (device: Device) =>
   {
+    if(state.isEditing)
+      return {valid: true, error: ""};
+
     if(!device?.name)
       return {valid: false, error: "Please type the device name!"};
-  
+
     if(!device?.hardwareVersion)
       return {valid: false, error: "Please type the device hardware version!"};
-      
+
     return {valid: true, error: ""};
   }
 
@@ -110,9 +117,6 @@ export default function DeviceForm()
   return (
     <DeviceFormView
       editMode={editMode}
-      apiAction={apiAction}
-      formType={formType}
-      title={title}
       state={state}
       onSubmit={onSubmit}
       onReturnClick={onReturnClick}
@@ -122,6 +126,13 @@ export default function DeviceForm()
 }
 
 
+const createEmptyState = () => {
+  const urlParams = appService.getCurrentURLParameters();
+  const isEditing = urlParams[2] ? true : false;
+  const message = isEditing ? "Please wait, loading the data..." : "";
+  return {isEditing, message, id: undefined, name: "", hardwareVersion: ""};
+}
+
 const reducer = (state: any, action: any) =>
 {
   if(action.type === "state")
@@ -129,3 +140,14 @@ const reducer = (state: any, action: any) =>
   else
     return { ...state, [action.type]: action.value };
 }
+
+interface IState {
+  isEditing: boolean;
+  message: string;
+
+  id?: number;
+  name?: string;
+  hardwareVersion?: string;
+}
+
+export type { IState };

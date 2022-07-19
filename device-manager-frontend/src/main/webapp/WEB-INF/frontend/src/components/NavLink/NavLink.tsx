@@ -1,27 +1,31 @@
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
-import { setAction } from "../../features/ApiAction";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 import navLinkMap from "../../data/NavLinkMap";
-import NavLinkView from "./NavLinkView";
+
+import "./NavLink.css";
 
 
 export default function NavLink()
-{
+{ 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const onSectionClick = (section: string, route: string) =>
-  {
-    dispatch(setAction({actionKey: section, params: []}));
-    navigate(route);
-  }
-
 
   return (
-    <NavLinkView
-      navLinkMap={navLinkMap}
-      onSectionClick={onSectionClick}
-    />
+    <nav className="nav-link">
+      {createSectionsElements(navigate)}
+    </nav>
   );
+}
+
+
+const createSectionsElements = (navigate: NavigateFunction) =>
+{
+  const elements: JSX.Element[] = [];
+  navLinkMap.forEach((v, k) =>
+  {
+    elements.push(
+      <button key={k} onClick={(e) => navigate(v.path)}>
+        {v.label}
+      </button>
+    );
+  });
+  return elements;
 }

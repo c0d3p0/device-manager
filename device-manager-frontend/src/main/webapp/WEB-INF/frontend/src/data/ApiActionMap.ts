@@ -1,6 +1,6 @@
 const baseUrl = "http://localhost:3000/frontend";
 
-const apiActionMap = new Map<string, any>([
+const apiActionMap = new Map<string, IAPIAction>([
   [
     "device",
     {
@@ -168,5 +168,11 @@ const apiActionMap = new Map<string, any>([
   ],
 ]);
 
+
+interface IAPIAction {
+  section: string;
+  url: string;
+  method: string;
+}
 
 export default apiActionMap;

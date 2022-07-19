@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-import { setAction } from '../../features/ApiAction';
 import appService from '../../service/AppService';
 import apiActionMap from '../../data/ApiActionMap';
 import Firmware from '../../model/Firmware';
@@ -12,30 +11,33 @@ import FirmwareListView from './FirmwareListView';
 
 export default function FirmwareList()
 {
-  const [firmwareData, setFirmwareData] = useState([] as Firmware[]);
+  const [firmwares, setFirmwares] = useState<Firmware[] | null>(null);
   const [message, setMessage] = useState("");
-  const apiActionData = useSelector((state: any) => state.apiAction.value);
-  const editMode = useSelector((state: any) => state.editMode.value as boolean);
+  const [refreshTime, setRefreshTime] = useState(Date.now());
+  const editMode = useSelector<any, boolean>((state) => state.editMode.value);
+  const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  useEffect(() => {fetchData();}, [apiActionData]);
+  useEffect(() => fetchData(), [location, refreshTime]);
 
 
   const fetchData = () =>
   {
-    const action = apiActionMap.get(apiActionData.actionKey);
-    const url = action?.url;
-    const method = action?.method;
-    const params = apiActionData?.params;
-    appService.executeRequest<Firmware[]>(url, method, params).then((response) => {
+    const urlParams = appService.getCurrentURLParameters();
+    const apiAction = getApiAction(urlParams);
+    const url = apiAction?.url;
+    const method = apiAction?.method;
+    const params = urlParams[3] ? [urlParams[3]] : undefined;
+    const requestData = {url, method, params};    
+    appService.executeRequest<Firmware[]>(requestData).then((response) =>
+    {
       let data = appService.convertData<Firmware>(response.data);
-      setFirmwareData(data);
+      setFirmwares(data);
       setMessage(data.length < 1 ? "Firmware not found!" : "");
-    }).
-    catch((error) => {
+    }).catch((error) =>
+    {
       const m = error?.response?.status === 400 ?
           "Firmware not found!" : "An error happened requesting the data!";
-      setFirmwareData([] as Firmware[]);
+      setFirmwares([]);
       setMessage(m);
       console.log(m);
       console.log(error);
@@ -44,44 +46,38 @@ export default function FirmwareList()
 
   const onAddClick = () =>
   {
-    const {actionKey, params} = apiActionData;
-    const previous = {actionKey, params};
-    dispatch(setAction({actionKey: "firmware-save", params: [], previous}));
     navigate("/firmware-form");
   }
 
   const onAttachToDevicesClick = (id?: number) =>
   {
-    const {actionKey, params} = apiActionData;
-    const k = "device-firmware-attach-devices";
-    const previous = {actionKey, params};
-    dispatch(setAction({actionKey: k, params: [id], previous}));
-    navigate("/device-firmware-form");
+    navigate(`/device-firmware-form/firmware/${id?.toString() ?? "-1"}`);
   }
 
   const onEditClick = (id?: number) =>
   {
-    const {actionKey, params} = apiActionData;
-    const previous = {actionKey, params};
-    dispatch(setAction({actionKey: "firmware-update", params: [id], previous}));
-    navigate("/firmware-form");
+    navigate(`/firmware-form/${id?.toString() ?? "-1"}`);
   }
   
   const onRemoveClick = (firmware: Firmware) =>
   {
-    let message = "Are you sure you want to remove the firmware ";
-    message += (firmware?.name ? firmware.name : "UNKNOWN") + "!";
+    const t = firmware.name ? `the firmware ${firmware.name}!` : "this firmware!";
+    let message = `Are you sure you want to remove ${t}`;
   
     if(confirm(message))
     {
-      const action = apiActionMap.get("firmware-delete");
-      const url = action?.url;
-      const method = action?.method;
-      appService.executeRequest<Firmware>(url, method, [firmware.id]).then((response) => {
-        dispatch(setAction({actionKey: "firmware-find-all", params: []}));
-        navigate("/" + (action?.section ? action.section : ""));
-      }).
-      catch((error) => {
+      const apiAction = apiActionMap.get("firmware-delete");
+      const url = apiAction?.url;
+      const method = apiAction?.method;
+      const params = [firmware.id?.toString() ?? "-1"];
+      const requestData = {url, method, params};
+      appService.executeRequest<Firmware>(requestData).then((response) =>
+      {
+        setRefreshTime(Date.now());
+        setFirmwares(null);
+        navigate("/firmware");
+      }).catch((error) =>
+      {
         let message = "An error happened deleting the firmware!";
         setMessage(message);
         console.log(message);
@@ -94,7 +90,7 @@ export default function FirmwareList()
     <FirmwareListView
       apiActionMap={apiActionMap}
       editMode={editMode}
-      firmwareData={firmwareData}
+      firmwares={firmwares}
       message={message}
       onAddClick={onAddClick}
       onAttachToDevicesClick={onAttachToDevicesClick}
@@ -103,3 +99,17 @@ export default function FirmwareList()
     />
   );
 }
+
+
+const getApiAction = (urlParams: string[]) => {
+  const key1 = apiActionKeyMap.get(urlParams[2]);
+  const key2 = apiActionKeyMap.entries().next().value[1];
+  const apiAction = apiActionMap.get(key1 ?? "invalid");
+  return apiAction ? apiAction : apiActionMap.get(key2);
+}
+
+const apiActionKeyMap = new Map<string, string>([
+  ["", "firmware-find-all"],
+  ["id", "firmware-find-by-id"],
+  ["name", "firmware-find-by-name"]
+]);

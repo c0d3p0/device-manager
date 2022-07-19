@@ -1,52 +1,59 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { setAction } from "../../features/ApiAction";
-import apiActionMap from "../../data/ApiActionMap";
-import searchActionMap from "../../data/SearchActionMap";
+import searchActionMap, { ISearchData } from "../../data/SearchActionMap";
+import appService from "../../service/AppService";
 import SearchView from "./SearchView";
 
 
 export default function Search()
 {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [searchDataList, setSearchDataList] = useState<ISearchData[]>([]);
   const [search, setSearch] = useState("");
-  const apiActionData = useSelector((state: any) => state.apiAction.value);
-  const apiAction = apiActionMap.get(apiActionData.actionKey);
-  const searchMap = searchActionMap.get(apiAction?.section ? apiAction.section : "");
-  const [apiActionKey, setApiActionKey] = useState(searchMap?.keys()?.next()?.value);
+  const [searchType, setSearchType] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => prepareSearch(), [location]);
 
+
+  const prepareSearch = () => {
+    const key = getSection();
+    const sdl = searchActionMap.get(key);
+    const searchData = sdl?.filter((sd) => sd.key === searchType)[0];
+    const newSearchType = searchData ? searchData.key : sdl?.[0]?.key
+    setSearchDataList(sdl ?? []);
+    setSearchType(newSearchType ?? "");
+  }
 
   const onSearchClick = () =>
   {
-    const secion = apiAction?.section;
-    const actionKey = search ? apiActionKey : secion;
-    
-    if(actionKey && secion)
-    {
-      const params = search ? [search] : [];
-      const actionPath = search ? `/${searchMap?.get(apiActionKey)?.path ?? ""}` : "";
-      const searchPath = search ? `/${search}` : "";      
-      dispatch(setAction({actionKey: actionKey, params: params}));
-      navigate(`/${secion}${actionPath}${searchPath}`);
-    }
-    else
-      navigate("/");
+    const params = search ? [search] : null;
+    const searchData = searchDataList.filter((sd) => sd.key === searchType)[0];
+    const validSearch = params && searchData ? true : false;
+    const section = getSection();
+    const type = validSearch ? searchData.path : "";
+    const path = validSearch ? `/${section}${type}/${search}` : `/${section}`;
+    navigate(path);
   }
 
 
   return (
     <SearchView
-      searchMap={searchMap}
+      searchDataList={searchDataList}
       search={search}
-      apiActionKey={apiActionKey}
-      // apiActionData={apiActionData}
-      // apiAction={apiAction}
+      searchType={searchType}
       setSearch={setSearch}
-      setApiActionKey={setApiActionKey}
+      setSearchType={setSearchType}
       onSearchClick={onSearchClick}
     />
   );
 }
+
+
+const getSection = () => {
+  const urlParams = appService.getCurrentURLParameters();
+  const aux = urlParams[1] ? urlParams[1].split("-")[0] : "device";
+  return validSectionSet.has(aux) ? aux : "device";
+}
+
+const validSectionSet = new Set(["device", "firmware"]);

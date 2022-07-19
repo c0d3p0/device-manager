@@ -11,15 +11,27 @@ export default function DeviceListView(props: IProps)
   const addDeviceButton = createAddDeviceElement(props);
   const listElements = createDeviceListElements(props);
 
+  if(props.devices && !props.message)
+  {
+    return (
+      <div className="device-list">
+        <div className="box">
+          <h2>Devices</h2>
+          <Search />
+          <div className='edit-actions'>{addDeviceButton}</div>
+        </div>
+        {listElements}
+      </div>
+    );
+  }
 
   return (
     <div className="device-list">
       <div className="box">
-        <h2>Device List</h2>
+        <h2>Devices</h2>
         <Search />
         <div className='edit-actions'>{addDeviceButton}</div>
       </div>
-      {listElements}
       {createMessageElement(props?.message)}
     </div>
   );
@@ -41,12 +53,9 @@ const createAddDeviceElement = (props: IProps) =>
 
 const createDeviceListElements = (props: IProps) =>
 {
-  const elements: JSX.Element[] = [];
-  props?.deviceData?.forEach((device: Device) =>
-  {
-    elements.push(createDeviceElement(props, device));
-  });
-  return elements;
+  return props?.devices?.map((device) =>
+    createDeviceElement(props, device)
+  );
 }
 
 const createDeviceElement = (props: IProps, device: Device) =>
@@ -89,28 +98,28 @@ const createDeviceEditElements = (props: IProps, device: Device) =>
         <button
           className="round-button"
           title="Show History"
-          onClick={(e) => {props?.onShowHistoryClick(device?.id);}}
+          onClick={(e) => {props.onShowHistoryClick(device?.id);}}
         >
           🕙
         </button>
         <button
           className="round-button"
           title="Attach Firmware"
-          onClick={(e) => {props?.onAttachFirmwareClick(device?.id);}}
+          onClick={(e) => {props.onAttachFirmwareClick(device?.id);}}
         >
           🖇
         </button>
         <button
           className="round-button"
           title="Edit Device"
-          onClick={(e) => {props?.onEditClick(device?.id);}}
+          onClick={(e) => {props.onEditClick(device?.id);}}
         >
           🗒
         </button>
         <button
           className="round-button"
           title="Remove Device"
-          onClick={(e) => {props?.onRemoveClick(device);}}
+          onClick={(e) => {props.onRemoveClick(device);}}
         >
           🗑
         </button>
@@ -124,7 +133,7 @@ const createDeviceEditElements = (props: IProps, device: Device) =>
         <button
           className="round-button"
           title="Show History"
-          onClick={(e) => {props?.onShowHistoryClick(device?.id);}}
+          onClick={(e) => {props.onShowHistoryClick(device?.id);}}
         >
           🕙
         </button>
@@ -223,7 +232,7 @@ interface IProps
 {
   apiActionMap: Map<string, any>;
   editMode: boolean;
-  deviceData: Device[];
+  devices: Device[] | null;
   message: string;
   onAddClick(): void;
   onShowHistoryClick(id?: number): void;

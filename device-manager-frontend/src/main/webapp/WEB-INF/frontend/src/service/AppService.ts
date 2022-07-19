@@ -6,9 +6,11 @@ import credentials from "../data/Credentials";
 
 class AppService
 {
-  executeRequest = <T>(url?: string, method?: string, params?: any[], body?: any)
+  executeRequest = <T>(requestData: RequestData)
       : Promise<AxiosResponse<T, any>> =>
   {
+    const {url, method, params, body} = requestData;
+
     if(url && method)
     {
       try
@@ -40,7 +42,7 @@ class AppService
   {
     let finalUrl = url;
     let finalParams = params ? params : [];
-    finalParams.forEach((param) => {finalUrl += "/" + param});
+    finalParams.forEach((param) => {finalUrl += `/${param}`});
     return finalUrl;
   }
 
@@ -97,8 +99,22 @@ class AppService
 
     return {headers: Object.assign(headers, attributes)};
   }
+
+  getCurrentURLParameters = () => {
+    const url = window.location.href;
+    const index = url.indexOf("/") + 1;
+    const params = url.substring(index, url.length).split("/");
+    return params.slice(1, params.length);
+  }
 }
 
+
+interface RequestData {
+  url?: string,
+  method?: string,
+  params?: string[],
+  body?: any
+}
 
 const appService = new AppService();
 export default appService;

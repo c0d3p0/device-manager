@@ -34,9 +34,9 @@ public class DeviceController
 	}
 
 	@GetMapping(path = "/by-name/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Device> getByName(@PathVariable String name)
+	public List<Device> getByNameWith(@PathVariable String name)
 	{
-		return deviceService.findByName(name);
+		return deviceService.findByNameWith(name);
 	}
 
 	@PostMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
